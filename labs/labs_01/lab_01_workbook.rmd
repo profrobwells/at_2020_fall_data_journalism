@@ -31,7 +31,7 @@ And here's a codeblock that contains one very simple line of code, a function th
 
 ```{r}
 
-print("Sean Mussenden")
+print("Aadit Tambe")
 
 ```
 
@@ -59,7 +59,8 @@ print("Sean Mussenden")
 **Task**: In the empty codeblock below, write the function to print out your own name and run it.  Include a comment inside the codeblock that explains what you're doing. If you get an error, compare your code to my code on line 38. 
 
 ```{r}
-
+# This function will print my name
+print("Aadit Tambe")
 ```
 
 ## Load data 
@@ -98,3 +99,5 @@ covid_state_current
 ## Workbook complete
 
 You're finished this workbook, but not this week's lab.  Save your changes, and go back to the webpage for the lab for next steps.
+
+I'm done!
