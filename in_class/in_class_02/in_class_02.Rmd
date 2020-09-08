@@ -10,7 +10,8 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+install.packages('knitr')
+install.packages('tidyverse')
 ```
 
 ## About this notebook 
