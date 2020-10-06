@@ -113,6 +113,30 @@ Joining gets much more complicated than this.  But at its core, this is how it w
 Okay, now it's your turn to work together in small groups to use this newly created table to answer our key question.
 
 *  Which state had the highest number of COVID-19 cases per 1,000 people on August 30, 2020?
+```{r}
+cases_per_1000 <-state_covid_population %>%
+  select(state, total_cases, population) %>%
+  mutate(cases_per_1000=(total_cases/population)*1000)%>%
+  arrange((cases_per_1000))
+
+cases_per_1000
+
+#Vermont
+
+```
+
 *  And while you're at it, answer this question: Which state had the lowest number of COVID-19 deaths per 1,000 people on August 30, 2020?
+```{r}
+cases_per_1000 <-state_covid_population %>%
+  select(state, total_cases, population) %>%
+  mutate(cases_per_1000=(total_cases/population)*1000)%>%
+  arrange(desc(cases_per_1000))
+
+cases_per_1000
+
+#Louisiana
+
+```
+
 
 -30-
