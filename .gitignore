@@ -37,3 +37,10 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+#Ignore large files
+/data_analysis_01/data
+
+#Ignore DSStore files
+.DS_Store
+in_class/.DS_Store

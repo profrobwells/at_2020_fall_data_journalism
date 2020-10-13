@@ -1,0 +1,22 @@
+---
+title: "osha_analysis"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load libraries
+```{r setup, echo=FALSE, message=FALSE}
+library(tidyverse)
+library(lubridate)
+```
+
+##Load Data
+```{r}
+osha_analysis_data <- read_csv("../data/osha_inspections.csv")
+
+glimpse(osha_analysis_data)
+
+```
