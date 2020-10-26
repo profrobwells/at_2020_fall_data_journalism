@@ -78,7 +78,7 @@ The agency has conducted slightly fewer safety inspections during the first thre
 ```{r}
 trump_begin_date <- "2017-01-20"
 trump_end_date <- "2020-01-20"
-trump_inspections <- osha_inspections %>%
+trump_inspections <- osha_analysis_data %>%
   filter(safety_hlth == "S") %>%
  filter(open_date >= trump_begin_date,
         open_date < trump_end_date)
@@ -93,7 +93,7 @@ count(trump_inspections)
 ```{r}
 obama_begin_date <- "2014-01-20"
 obama_end_date <- "2017-01-20"
-obama_inspections_2t <- osha_inspections %>%
+obama_inspections_2t <- osha_analysis_data %>%
   filter(safety_hlth == "S") %>%
  filter(open_date >= obama_begin_date,
         open_date < obama_end_date)
@@ -107,3 +107,7 @@ count(obama_inspections_2t)
 (count(obama_inspections_2t)) - (count(trump_inspections))
 #Q: What's the difference in inspections between Trump and Obama?
 #A:5638. OSHA conducted 5638 more safety inspections during the last three years of Obama's second term than in the first three years of Trump's presidency. A slightly larger amount.
+```
+
+
+
