@@ -176,35 +176,37 @@ x <- (count(obama_inspections)) - (count(trump_inspections))
 Amid the COVID-19 pandemic, OSHA has been cutting back even more, conducting only 5,127 inspections since March 13, when Trump declared the coronavirus a national emergency. That’s a drop of about two-thirds compared to the same period last year.
 
 ```{r}
-#create an object called covid_inspections
-covid_start<- "2020-03-13"
-covid_end<- "2020-08-18" #date article was published
+#First, we're going to create a new object and call it osha_covidinspections
+covid_begin <- "2020-03-13" #Trump declared COVID-19 national emergency on this date
+covid_end <- "2020-08-18" #CPI published its article on this date
+
 covid_inspections<-osha_analysis_data%>%
-  #According to the Center for Public Integrity's repo, the "M" in insp_type refers to fatalities/ catastrophes 
-  #And "S" in safety_hlth column refers to Safety inspections
-    filter(safety_hlth == "S") %>%
-   filter(open_date >= covid_start,
-          open_date < covid_end,
-          insp_scope != "D") # no non-inspections
+  #"M" in insp_type, according to CPI is fatalities/ catastrophes
+  #"S" in safety_hlth is 'Safety inspections'
+ 
+  filter(safety_hlth == "S") %>% #first we do "S"
+ 
+   filter(open_date >= covid_begin) %>%
+   filter(open_date < covid_end) %>%
+   filter(insp_scope !="D") #now we do "D"
+
 count(covid_inspections)
+#ANSWER: 4457 is the number of covid_inspections during that time period
 
-#4557 inspections were conducted during covid period 
+#now, we can use the same dates, just for last year in 2019.
+compare_begin <-"2019-03-13"
+compare_end<-"2019-08-18"
 
-#now, let's compare that to the same period last year:
-# these are same dates, just from last year
-compare_start <-"2019-03-13"
-compare_end<- "2019-08-18" 
-# create an object called compare_inspections
-compare_inspections<-osha_analysis_data%>%
+#new object called compare_oshainspections
+
+compare_oshainspections <-osha_analysis_data%>%
     filter(safety_hlth == "S") %>%
-   filter(open_date >= compare_start,
-          open_date < compare_end,
-          insp_scope != "D") # no non-inspections
-count(compare_inspections)
+   filter(open_date >= compare_begin) %>% #same as before but now we put compare_begin
+   filter(open_date < compare_end) %>% #same as before but now it's compare_end
+   filter(insp_scope != "D")
 
-#13400 inspections were conducted last year.
-
-#4557 is approximately two-thirds of #13400, which matches the answer derived by the Center for Public Integrity.
+count(compare_oshainspections) #now, we see how many inspections there were last year.
+#ANSWER: There were 13400 last year. Compared to 4457, that is about a drop of 2/3.
 
 
 ```
