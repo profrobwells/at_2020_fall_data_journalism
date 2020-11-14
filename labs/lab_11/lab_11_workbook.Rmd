@@ -247,6 +247,25 @@ Create a code block below, and create a bar chart showing the increase in case r
 
 ```{r}
 
+#Step 1: create object
+baltimore_city <- maryland %>%
+  filter(county == "Baltimore city")
+baltimore_city
+
+#Step 2: visualize
+baltimore_city %>%
+  ggplot(aes(month, case_rate)) +
+  geom_bar(stat="identity", fill="lightblue3") +
+  labs(
+    x="Months",
+    y="Cases per 1,000 people",
+    title="This chart illustrates a steady increase of COVID-19 cases in Baltimore city",
+    caption="Source: NYTimes COVID-19 data"
+  ) +
+  geom_text(aes(label=round(case_rate,0)))
+
+
+
 ```
 
 ## You're done
