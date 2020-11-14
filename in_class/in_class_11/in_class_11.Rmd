@@ -105,7 +105,7 @@ anne_arundel %>%
     x = "Month",
     y = "Cases per 1,000 people",
     title = "In Anne Arundel, steady increase in COVID cases",
-    caption = "Source: NYT"
+    caption = "Source: NYT COVID-19"
   )+
   geom_text(aes(label=round(case_rate,2)),
             vjust = -.1)
