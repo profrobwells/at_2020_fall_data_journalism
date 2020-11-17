@@ -72,7 +72,11 @@ Each row is a county in Maryland. The columns are as follows:
 **Task (Run Code)**: run the code below to load data.
 
 ```{r}
-maryland <- read_csv("data/maryland_county_monthly_case_rate.csv") 
+
+maryland <- read_csv("data/maryland_county_monthly_case_rate.csv") %>%
+  mutate(month = as_factor(month)) %>%
+  mutate(month = ordered(month, levels = c("March", "April", "May", "June", "July", "August")))
+
 ```
 
 ## Examine data
@@ -249,7 +253,8 @@ Create a code block below, and create a bar chart showing the increase in case r
 
 #Step 1: create object
 baltimore_city <- maryland %>%
-  filter(county == "Baltimore city")
+  mutate(month = as_factor(month)) %>%
+  filter(county == "Baltimore city", month %in% c("May", "June", "July", "August"))
 baltimore_city
 
 #Step 2: visualize
@@ -262,7 +267,7 @@ baltimore_city %>%
     title="This chart illustrates a steady increase of COVID-19 cases in Baltimore city",
     caption="Source: NYTimes COVID-19 data"
   ) +
-  geom_text(aes(label=round(case_rate,0)))
+  geom_text(aes(label=round(case_rate,2)))
 
 
 
