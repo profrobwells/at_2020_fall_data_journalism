@@ -8,7 +8,6 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
 
 ```{r}
-# Load the tidyverse
 
 ```
 
@@ -20,13 +19,23 @@ This is our final project notebook by Aadit and Kara. We will write a proper int
 ## Load packages
 
 ```{r}
-#blscrapeR will allow us to get NAICS codes, which we will join with the complaint data to see which industry most complaints related to 
-install.packages("blscrapeR")
+# Load the tidyverse
+#blscrapeR will allow us to get NAICS codes, which we will join with the complaint data to see to which industry most complaints related.
+
+
+#install.packages("blscrapeR")
+#install.packages("tidytext")
+#install.packages("textstem")
+
 library(tidyverse)
 library(lubridate)
 library(readxl)
 library(janitor)
 library(blscrapeR)
+library(tidytext)
+library(textstem)
+
+
 ```
 
 ## Load Data
@@ -83,21 +92,11 @@ complaints
 
 ```
 
-```{r}
-
-#I don't remember what this is. Aadit, do you?
-# KARA - I think this is when we were just looking at the dataset to figure out the difference between open and closed complaints
-# compare_df_cols(open_complaints, closed_complaints) %>%
-#  arrange(desc(open_complaints))
-
-```
-
 
 ## Motivating questions
 
-
 ### Question 1: How many COVID-19-related complaints have been filed to OSHA?
-### Answer: There were 31,278 closed complaints and 11,140 open complaints as of Nov. 6, 2020, for a total of 42,418 complaints.
+## Answer: There were 31,278 closed complaints and 11,140 open complaints as of Nov. 6, 2020, for a total of 42,418 complaints.
 
 ```{r}
 # Create a new object called "totals." Group by complaint status and count for each category.
@@ -121,8 +120,8 @@ totals
 #Pull in industry codes dataframe using blscrapeR package.
 industry_codes <- naics
 
-# create an object complaints_x
-complaints_x <- complaints %>%
+# create an object complaints_industry_codes
+complaints_industry_codes <- complaints %>%
   # in this step, we separate the two NAICS codes into two columns: primary_site_naics_1 and primary_site_naics_2
   separate(primary_site_naics, sep = "/", into = c("primary_site_naics_1","primary_site_naics_2"))%>%
   # next, we take out the spaces before and after the codes using str_trim
@@ -173,14 +172,14 @@ complaint_locations <- complaints %>%
 
 complaint_locations
 
-#group by state and count, arrange descending
+
 
 #New questions: Should we weight by number of workers in those states? If so, what time frame would we use such data from, given how COVID has affected the economy?
 ```
 
 
-##Motivating Question 4. Which states have the fewest complaints?
-##Utah had the fewest complaints with 2. Eight locations (including the U.S. Virgin Islands and the District of Columbia) had 25 or fewer complaints.
+### Motivating Question 4. Which states have the fewest complaints?
+### Answer: Utah had the fewest complaints with 2. Eight locations (including the U.S. Virgin Islands and the District of Columbia) had 25 or fewer complaints.
 ```{r}
 
 #Location data is only available for closed complaints. Create a new object called "complaint_locations" and filter for closed complaints.
@@ -199,20 +198,98 @@ complaint_locations
 
 ```
 
-##Motivating Question 5. What are the details/nature of complaints [text analysis]
+
+### Question 5. What are the details/nature of complaints [text analysis]
 
 ```{r}
-complaints_y <- complaints %>%
-  filter(str_detect(hazard_desc_location, "^Employee|^employee"))
+
+stop_words_edited <- stop_words %>%
+  filter(!str_detect(word, "serious"))
+
+#Make all text in the hazard description lowercase.
+text_analysis <- complaints_industry_codes %>%
+  filter(complaint_status == "closed_complaint") %>%
+  ungroup() %>%
+  select(upa_number, site_state, hazard_desc_location) %>%
+  mutate(hazard_desc_location = tolower(hazard_desc_location)) 
+
+
+complaints_closed_words <- text_analysis %>% 
+  unnest_tokens(word, hazard_desc_location, token="words") %>%
+  anti_join(stop_words_edited) %>%
+  mutate(word = str_remove_all(word, "[0-9]")) %>%
+  mutate(word = str_remove_all(word,"[:punct:]")) %>%
+  group_by(word) %>% 
+  count() %>%
+  arrange(desc(n)) %>%
+  anti_join(stop_words_edited) %>%
+  mutate(word_category = lemmatize_words(word)) %>%
+  ungroup() %>%
+  group_by(word_category) %>%
+  summarise(n = sum(n)) %>%
+  arrange(desc(n))
+
+
+trigrams_complaints_closed <- text_analysis %>% 
+  unnest_tokens(trigram, hazard_desc_location, token="ngrams", n=3) %>%
+  group_by(trigram) %>%
+  count() %>%
+  arrange(desc(n))
+
+tetragrams_complaints_closed <- text_analysis %>% 
+  unnest_tokens(tetragram, hazard_desc_location, token="ngrams", n=4) %>%
+  group_by(tetragram) %>%
+  count() %>%
+  arrange(desc(n))
+
+
+pentagrams_complaints_closed <- text_analysis %>% 
+  unnest_tokens(pentagram, hazard_desc_location, token="ngrams", n=5) %>%
+  group_by(pentagram) %>%
+  count() %>%
+  arrange(desc(n))
+
+
+
+
+sentences_complaints_closed <- text_analysis %>% 
+  unnest_tokens(sentence, hazard_desc_location, token="sentences") %>%
+  mutate(sentence = str_remove_all(sentence, "[0-9]")) %>%
+  mutate(sentence = str_remove_all(sentence,"[:punct:]")) %>%
+  mutate(sentence = str_trim(sentence, side="both")) %>%
+  group_by(sentence) %>%
+  count() %>%
+  arrange(desc(n))
+
+
+
+#complaints_y <- complaints %>%
+#  filter(str_detect(hazard_desc_location, "^Employee|^employee"))
+
+#Create a new object called "complaint_descriptions_frequency."
+complaint_descriptions_frequency <- closed_complaints %>%
+
+#Count the frequency of each complaint description.
+  count(hazard_desc_location, sort= TRUE) %>%
+
+#Arrange in descending order.
+  arrange(desc(n))
+
+
+
+
+
+
+
 
 
 ```
 
 
-##Motivating Question 6. How often do these complaints trigger inspections? [join with inspection data]
+### Motivating Question 6. How often do these complaints trigger on-site inspections? [join with inspection data]
 ```{r}
 
-# We would join on "establishment name"
+# We would join inspection data with closed_complaints on "establishment name."
 # We need Sean to show us how to get the latest inspection data
 
 
