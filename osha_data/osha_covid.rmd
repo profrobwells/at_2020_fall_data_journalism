@@ -267,7 +267,9 @@ complaint_locations
 
 ## INDUSTRIES
 ### Question 2. What types of industries are complaints coming from?
-### Answer:
+### Answer for 2-digit codes: The highest number of complaints come from the Agriculture, Forestry, Fishing and Hunting industry with a rate of 0.94 complaints per 1,000 employees. The Arts, Entertainment, and Recreation industry ranked second with 0.42 complaints per 1,000 employees.
+### Answer for 3-digit codes: The highest number of complaints come from the federal Postal service with a rate of 1.01 complaints per 1,000 employees. Miscellaneous Store Retailers ranked second with 0.94 complaints per 1,000 employees. Furniture and Related Product Manufacturing followed closely with 0.93 complaints per 1,000 employees.
+### Note: There are still some duplicates in the weighted complaints data frames, however it does not cause errors in the weighted calculation. We will continue to refine the code to address this issue.
 
 
 ```{r}
@@ -293,7 +295,9 @@ complaints_weighted_2digit <- complaints_industry_codes_2digit %>%
   mutate(complaints_per_1000_employees = n/total_employees*1000) %>%
   # Select only the columns we want to view and arrange in descending order.
   select(industry_code_clean, industry_title_2digit, complaints_per_1000_employees) %>%
-  arrange(desc(complaints_per_1000_employees))
+  arrange(desc(complaints_per_1000_employees)) %>%
+  # Use distinct function to retain only unique/distinct rows in the data set.
+  distinct() 
 
 ```
 
@@ -303,17 +307,13 @@ complaints_weighted_2digit <- complaints_industry_codes_2digit %>%
 
 # Create a new object called complaints_industry_codes_3digit
 complaints_industry_codes_3digit <- complaints_industry_codes %>%
-  # look at the first three digits of the codes
+  # Look at the first three digits of the codes
   mutate(primary_site_naics_1_3digit = str_sub(primary_site_naics_1, start = 1L, end = 3L)) %>%
-  # join with industry_size data frame, which includes industry titles and number of employees
+  # Join with industry_size data frame, which includes industry titles and number of employees
   left_join(industry_size_clean, by = c("primary_site_naics_1_3digit" = "industry_code_clean")) %>%
-  filter(is.na(ownership_code)) %>%
-  group_by(primary_site_naics_1_3digit) %>%
-  count()
-  
-  # rename industry_title column to indicate that we're looking just at three-digit codes
+  # Rename industry_title column to indicate that we're looking just at three-digit codes.
   rename(industry_title_3digit = industry_title) %>%
-  # group by industry title and count the number of complaints
+  # Group by industry title and count the number of complaints.
   group_by(industry_title_3digit)%>%
   count()
 
@@ -323,11 +323,6 @@ complaints_weighted_3digit <- complaints_industry_codes_3digit %>%
   mutate(complaints_per_1000_employees = n/total_employees*1000) %>%
   select(industry_code_clean, industry_title_3digit, complaints_per_1000_employees) %>%
   arrange(desc(complaints_per_1000_employees))
-
-
-complaints_weighted_x <- complaints_industry_codes_3digit %>%
-  inner_join(industry_size_clean, by = c("industry_title_3digit" = "industry_title"))
-
 
 ```
 
